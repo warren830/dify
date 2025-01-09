@@ -760,7 +760,17 @@ export const useWorkflowRun = () => {
       edges,
       viewport,
     })
-    featuresStore?.setState({ features: publishedWorkflow.features })
+    // 添加调试日志
+    console.log('Features to restore:', publishedWorkflow.features)
+    console.log('FeaturesStore:', featuresStore)
+
+    // 修改为更安全的调用方式
+    if (featuresStore && publishedWorkflow.features) {
+      featuresStore.setState({ features: publishedWorkflow.features })
+      // 或者使用 getState 方式
+      const currentState = featuresStore.getState()
+      console.log('Features state after update:', currentState)
+    }
     workflowStore.getState().setPublishedAt(publishedWorkflow.created_at)
     workflowStore.getState().setEnvironmentVariables(publishedWorkflow.environment_variables || [])
   }, [featuresStore, handleUpdateWorkflowCanvas, workflowStore])
