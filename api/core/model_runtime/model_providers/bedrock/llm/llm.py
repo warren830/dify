@@ -339,7 +339,8 @@ class BedrockLargeLanguageModel(LargeLanguageModel):
                         # Get reasoning content text
                         reasoning_text = delta["reasoningContent"]["text"] or ""
                         
-                        # Use class variable to track if header has been added, instead of relying on full_assistant_content which may not be updated
+                        # Use class variable to track if header has been added, 
+                        # instead of relying on full_assistant_content which may not be updated
                         if not hasattr(self, '_reasoning_header_added'):
                             self._reasoning_header_added = False
                         
@@ -365,7 +366,7 @@ class BedrockLargeLanguageModel(LargeLanguageModel):
                             prompt_messages=prompt_messages,
                             delta=LLMResultChunkDelta(index=index + 1, message=assistant_prompt_message),
                         )
-                    elif "text" in delta and delta["text"]:
+                    elif delta.get("text"):
                         text = delta["text"]
                         
                         # Check if separator and line breaks need to be added
