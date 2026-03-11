@@ -34,7 +34,7 @@ from core.workflow.nodes.base import variable_template_parser
 from core.workflow.nodes.base.entities import BaseNodeData, RetryConfig
 from core.workflow.nodes.base.node import Node
 from core.workflow.nodes.llm import ModelConfig, llm_utils
-from factories.variable_factory import build_segment_with_type
+
 
 from .entities import ParameterExtractorNodeData
 from .exc import (
@@ -618,28 +618,26 @@ class ParameterExtractorNode(Node):
                     if isinstance(param_value, list):
                         nested_type = parameter.element_type()
                         assert nested_type is not None
-                        segment_value = build_segment_with_type(segment_type=SegmentType(parameter.type), value=[])
-                        transformed_result[parameter.name] = segment_value
+                        array_value: list = []
+                        transformed_result[parameter.name] = array_value
                         for item in param_value:
                             if nested_type == SegmentType.NUMBER:
                                 transformed = self._transform_number(item)
                                 if transformed is not None:
-                                    segment_value.value.append(transformed)
+                                    array_value.append(transformed)
                             elif nested_type == SegmentType.STRING:
                                 if isinstance(item, str):
-                                    segment_value.value.append(item)
+                                    array_value.append(item)
                             elif nested_type == SegmentType.OBJECT:
                                 if isinstance(item, dict):
-                                    segment_value.value.append(item)
+                                    array_value.append(item)
                             elif nested_type == SegmentType.BOOLEAN:
                                 if isinstance(item, bool):
-                                    segment_value.value.append(item)
+                                    array_value.append(item)
 
             if parameter.name not in transformed_result:
                 if parameter.type.is_array_type():
-                    transformed_result[parameter.name] = build_segment_with_type(
-                        segment_type=SegmentType(parameter.type), value=[]
-                    )
+                    transformed_result[parameter.name] = []
                 elif parameter.type in (SegmentType.STRING, SegmentType.SECRET):
                     transformed_result[parameter.name] = ""
                 elif parameter.type == SegmentType.NUMBER:
